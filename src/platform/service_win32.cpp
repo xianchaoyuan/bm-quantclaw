@@ -1,4 +1,4 @@
-// Copyright 2025 QuantClaw Contributors
+﻿// Copyright 2025 QuantClaw Contributors
 // SPDX-License-Identifier: Apache-2.0
 
 #ifdef _WIN32
@@ -17,6 +17,18 @@ ServiceManager::ServiceManager(std::shared_ptr<spdlog::logger> logger)
   pid_file_ = state_dir_ + "\\gateway.pid";
   log_file_ = state_dir_ + "\\logs\\gateway.log";
   std::filesystem::create_directories(state_dir_ + "\\logs");
+
+  // Clean up stale PID file from a previous unclean shutdown
+  if (std::filesystem::exists(pid_file_)) {
+    std::ifstream f(pid_file_);
+    int pid = -1;
+    f >> pid;
+    f.close();
+    if (pid > 0 && !is_process_alive(static_cast<ProcessId>(pid))) {
+      std::filesystem::remove(pid_file_);
+      logger_->debug("Removed stale PID file (PID: {})", pid);
+    }
+  }
 }
 
 std::string ServiceManager::service_path() const {

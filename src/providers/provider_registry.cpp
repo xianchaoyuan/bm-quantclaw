@@ -168,6 +168,14 @@ void ProviderRegistry::RegisterBuiltinFactories() {
                                           "https://api.together.xyz/v1",
                                           "openai-completions");
   });
+
+  // DeepSeek (OpenAI-compatible API)
+  RegisterFactory("deepseek", [](const ProviderEntry& entry,
+                                 std::shared_ptr<spdlog::logger> logger) {
+    return CreateOpenAICompatibleProvider(entry, std::move(logger),
+                                          "https://api.deepseek.com/v1",
+                                          "openai-completions");
+  });
 }
 
 void ProviderRegistry::AddProvider(const ProviderEntry& entry) {

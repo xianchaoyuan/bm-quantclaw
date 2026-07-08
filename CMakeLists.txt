@@ -61,15 +61,18 @@ find_package(spdlog REQUIRED)
 find_package(CURL REQUIRED)
 find_package(OpenSSL REQUIRED)
 
-# nlohmann_json: use FetchContent to ensure consistent version across all environments
+# nlohmann_json: try vcpkg first, fallback to FetchContent
 include(FetchContent)
-FetchContent_Declare(
-    nlohmann_json
-    GIT_REPOSITORY https://github.com/nlohmann/json.git
-    GIT_TAG v3.11.3
-    GIT_SHALLOW TRUE
-)
-FetchContent_MakeAvailable(nlohmann_json)
+find_package(nlohmann_json CONFIG QUIET)
+if(NOT nlohmann_json_FOUND)
+    FetchContent_Declare(
+        nlohmann_json
+        GIT_REPOSITORY https://github.com/nlohmann/json.git
+        GIT_TAG v3.11.3
+        GIT_SHALLOW TRUE
+    )
+    FetchContent_MakeAvailable(nlohmann_json)
+endif()
 
 # IXWebSocket: try vcpkg first, fallback to FetchContent
 set(USE_TLS ON CACHE BOOL "" FORCE)
